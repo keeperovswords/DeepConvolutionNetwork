@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-06-13T13:05:52+02:00</updated><id>http://localhost:4000/</id><title type="html">Deep Convolutoin Neural Network</title><subtitle>Deep Learning, Convolution Neural Network, Computer Vision
+</subtitle><author><name>Jian Xi</name></author><entry><title type="html">Deep Learning</title><link href="http://localhost:4000/main/2017/04/11/deep-learning.html" rel="alternate" type="text/html" title="Deep Learning" /><published>2017-04-11T13:28:55+02:00</published><updated>2017-04-11T13:28:55+02:00</updated><id>http://localhost:4000/main/2017/04/11/deep-learning</id><content type="html" xml:base="http://localhost:4000/main/2017/04/11/deep-learning.html">&lt;h1&gt;Prologue&lt;/h1&gt;
+&lt;p&gt;As we mentioned in previous sections, the pipeline of image recognition can be polished by reconsidering its workflow. Now it looks as shows in figure:&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/pipeline.png&quot; width=&quot;55%&quot; /&gt;
+&lt;/div&gt;
+&lt;p&gt;After the image is preprocessed as needed, the features will be extracted. Then these features are used for model training. This is actually so called &lt;strong&gt;Shallow Learning&lt;/strong&gt;, which focuses on the expert knowledge in image processing in our task. It’s kind of limitation here, cause the learning results also intensively depends on the feature selection part. In contrast to shallow learning, 
+&lt;a href=&quot;http://www.deeplearningbook.org/&quot;&gt;Deep Learning&lt;/a&gt; is raw data-oriented representation learning approach. It’s normally supplied by the data in the raw form. There inputs are passed through a parametrized computational graph that’s much more representational. This graph usually has many layers and optimized by &lt;a href=&quot;https://github.com/keeperovswords/Optimization&quot;&gt;gradient-based schema&lt;/a&gt;. During the training the important features will be activated by this computational graph without extra feature extraction process.
+Now the most popular deep visual learning model is Convolution Neural Network. Let’s throught it out briefly.&lt;/p&gt;
+
+&lt;h1&gt;Convolution Neural Network&lt;/h1&gt;
+&lt;p&gt;Comparing with densely connected feed forward neural network, convolution neural network &lt;a href=&quot;https://en.wikipedia.org/wiki/Convolutional_neural_network&quot;&gt;(CNN)&lt;/a&gt;  needs much few parameter. At one side it use sparsely connections in neural layers, at another side the subpooling mechanisim provides a probability to share parameters between neurons. I’m not going to depict is deeply, cause there are lots of articals talk about theoretically. You’d better to inform them yourself.Brielfy to say, it works af follows.&lt;/p&gt;
+&lt;h2&gt;Forward propagation&lt;/h2&gt;
+&lt;p&gt;With a convolution filter with fixed size the input neurons are not fully connected with the inputs. From it the feature will be activated. These features will be subsampled in subsampling layers. There are two subsampling strategies: &lt;strong&gt;Mean-Pooling&lt;/strong&gt;, which calculates the mean in a pooling filter size. &lt;strong&gt;Max-Pooling&lt;/strong&gt; determines the maximum of the activated maps in a pooling filter size. After subpooling the results will be continuously convoluted as needs.
+ The activated maps after &lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;- convolution layers are connected densely with feed forward neural network as we used before. The class scores are calculated in the last dense layer by using &lt;a href=&quot;https://github.com/keeperovswords/Optimization&quot;&gt;Entropy loss&lt;/a&gt;. 
+ With convolution operation and subpooling the parameters share there weight in a filter size. It’s called &lt;strong&gt;weight-sharing&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Backward Propagation&lt;/h2&gt;
+&lt;p&gt;The scores is back propagated from last layer to the first convolution layer. For learning such a network by means of training examples, it turns to learn a input-output pattern correspondingly. The information of training samples is usually not sufficient by itself to reconstruct the unknown input-output mapping uniquely. Therefore we have to face the &lt;strong&gt;Overfitting&lt;/strong&gt; problem. To conquer this issue we may use the &lt;a href=&quot;https://github.com/keeperovswords/Optimization&quot;&gt;regularization&lt;/a&gt; method. Normally it has the following definition:
+&lt;script type=&quot;math/tex&quot;&gt;\begin{equation}
+(Regularized\ cost\ function) = (Empirical\ cost\ function) + ( Regularization\ parameter) \times ( Regularizer),
+ \end{equation}&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;In our case the empirical cost is the entropy cost we got and we use &lt;script type=&quot;math/tex&quot;&gt;L2&lt;/script&gt; regularization as regularizer. The regularization paremeter &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt; is determined normally by validation design.&lt;/p&gt;
+
+&lt;h2&gt;Implementation&lt;/h2&gt;
+
+&lt;p&gt;After showing the necessary techniques in deep learning consicely, let’s go back to our classification problem. Here I used one convolution layer and a mean-pooling layer. The sub pooled features will be fed to a dense neural layer. Its strcuture is very simple. For optimizing the computational graph I used the Stochastic Gradient Descent &lt;a href=&quot;http://ufldl.stanford.edu/tutorial/supervised/OptimizationStochasticGradientDescent/&quot;&gt;SGD+Momentum&lt;/a&gt;.
+Ususally the SGD works alone well, but at the saddle points the cost function nudges very hesitated. In order to make the learner lernens effectively, the Momentum is introduced. As in following figure depicts, the cost function has benn reduced ineffectively at the first 20 iteration in first epoch. After then it converges very smoothly.&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/cnn_loss.png&quot; width=&quot;95%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/cnn_feature.png&quot; width=&quot;65%&quot; /&gt;
+  &lt;div class=&quot;figcaption&quot;&gt;&lt;b&gt;Top: &lt;/b&gt; The cost function of cnn &lt;b&gt;Bottom: &lt;/b&gt; the activated mapping in the first convolution layer &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;As the input singal got forward propagated, the features turn to be much form or object oritend. I’m not showing  here that this structur is the best design. But it works for some numbers even better than MLP + HoG we trained previously as shows in the following figure&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/cnn_mlp.png&quot; width=&quot;70%&quot; /&gt;
+&lt;/div&gt;
+&lt;p&gt;This model is actually not deep enough and it can be dramatically improved by tweaking its structur, i.e. say using ReLU for activation or &lt;a href=&quot;https://arxiv.org/abs/1502.03167&quot;&gt;Batch Normalization&lt;/a&gt; to normalize the inputs in each convolution layer.&lt;/p&gt;
+
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;In contrast to models we introduced in previous sections, deep learning models need less image processing knowledge. The model strucutre has the ability to detect the most important features in inputs  on its own.&lt;/p&gt;</content><author><name>Jian Xi</name></author><summary type="html">Prologue As we mentioned in previous sections, the pipeline of image recognition can be polished by reconsidering its workflow. Now it looks as shows in figure: After the image is preprocessed as needed, the features will be extracted. Then these features are used for model training. This is actually so called Shallow Learning, which focuses on the expert knowledge in image processing in our task. It’s kind of limitation here, cause the learning results also intensively depends on the feature selection part. In contrast to shallow learning, Deep Learning is raw data-oriented representation learning approach. It’s normally supplied by the data in the raw form. There inputs are passed through a parametrized computational graph that’s much more representational. This graph usually has many layers and optimized by gradient-based schema. During the training the important features will be activated by this computational graph without extra feature extraction process. Now the most popular deep visual learning model is Convolution Neural Network. Let’s throught it out briefly.</summary></entry><entry><title type="html">Model Candidate</title><link href="http://localhost:4000/main/2017/02/15/model-candidate.html" rel="alternate" type="text/html" title="Model Candidate" /><published>2017-02-15T20:30:15+01:00</published><updated>2017-02-15T20:30:15+01:00</updated><id>http://localhost:4000/main/2017/02/15/model-candidate</id><content type="html" xml:base="http://localhost:4000/main/2017/02/15/model-candidate.html">&lt;p&gt;By now we got the training data. Which model is the best for our problem? We investigated the object recognition tasks such as street house number recognition, MNIST-benchdata classification and pedestrian detection etc. The models enjoy much privilege have been also considered in our problem.&lt;/p&gt;
+
+&lt;h1&gt;Support Vector Machine&lt;/h1&gt;
+&lt;p&gt;Support Vector Machine &lt;a href=&quot;https://en.wikipedia.org/wiki/Support_vector_machine&quot;&gt;(SVM)&lt;/a&gt; presents a very easy understandable way for classification problems. The basis idea of it is derived from linear classifier. We want to find the support vectors that maximize the margin between two classes, which is depicted as follows:&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/svm_decision_boundary.png&quot; width=&quot;55%&quot; /&gt;
+ &lt;div class=&quot;figcaption&quot;&gt; Support Vectors and the optimal hyperplane &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;The dash line represents the optimal decision boudary between class &lt;script type=&quot;math/tex&quot;&gt;c_1&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;c_2&lt;/script&gt;, whereas solide line is just normal decision boundary that sepaerates them, but in a perfect way. Because our image class is a nonlinear classification problem, which means the data in input space is nonlinear separable. For solving this problem wen can map the data in input space into feature space, where the data is linear separable. The &lt;a href=&quot;https://www.pearson.com/us/higher-education/program/Haykin-Neural-Networks-and-Learning-Machines-3rd-Edition/PGM320370.html&quot;&gt;Kernel&lt;/a&gt; enable the mapping the data from input space to feature space, which is usually a doc product operation. Therefore sometimes kernel method is a alias of SVM. The ability of different kernels to classification varies, so we need to find out which the best kernel candidate for our problem. Ususally the polynomial kernel delieveries a good performance as in the other cases.&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/modelparam_svm.png&quot; width=&quot;55%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;h1&gt;Multiple-layer Perceptron&lt;/h1&gt;
+
+&lt;p&gt;Multiple layer perceptron (MLP) is inspired by the biological neural system. The network input function accept the input from the outside of the perceptron and continuously propagates the linear combination of inputs and their weights to the activation function. The classification will be then executed according to the comparing the activation function’s output with an threshold values. For solving the nonlinear classification problem we built multiple layer perceptrons, whereby the neural perceptrons in input layers read the data. Than activation process are aroused in each perceptron. The neural perceptron in different layers are connected synapticly and not connected in the same layers.&lt;/p&gt;
+
+&lt;p&gt;The net works generally in two phases:
+&lt;strong&gt;Forward propagation:&lt;/strong&gt;, in which the function signals are propagated forwards from layer to layer till it reach the output layers. In output layer we usually get a score for each class. According to this scores we just send  the adjustment message backwards layer to later, which is the &lt;strong&gt;Backward propagation&lt;/strong&gt;, in this process the parameters will be adjusted according to the classification scores. This is actually sometimes called &lt;strong&gt;blame assignment&lt;/strong&gt; problem. It means how the errors will be assigned to where it probably aroused potentially. 
+The structure of the nets or the parameters such as the weights of neurons, the number of hidden layers are very important for the final classification results. Theses parameters should be investigated by validation. As the validation resuts show in the figure,&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/modelparam_mlp.png&quot; width=&quot;55%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;the number of neurons in hidden layers play a role for final classification accuracy. Descripe all complicated models, normally the 3 layers MLP (without counting input layers) is the best structure for classification problem.&lt;/p&gt;
+
+&lt;h1&gt;k-Nearest Neighbor&lt;/h1&gt;
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;-Nearest Neighbor &lt;a href=&quot;https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm&quot;&gt;KNN&lt;/a&gt; is a lazying methods.  What we need for this method is just a hyperparamter of &lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt; and a labeled dataset. When a test object comes, this algorithm calculates the similarity of this object between all training objects by using some distance measure approaches such as euclidean distance. As said before, this algorithm requires a large memory resource on demand for loading the all training data, that’s why it’s called lazying learning method. Further more it takes much longer time than other models during prediction or classification. By comparing the similarity between test object and all training data we’ll get a dataset, which is the &lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;-nearest neighbor of test object. The final label of test object is the most frequent labels in this dataset. After validation we got the $5-$ nearest neighbor brings the best accuracy for our problem as shows as follows:&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/modelparam_knn.png&quot; width=&quot;55%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;As you can see either SVM, MLP or KNN works individually. Is it possible that we can combine the basic single model together to get a better performance? By using this idea we can boost the basic models or adaboost a single model many times.&lt;/p&gt;
+
+&lt;h1&gt;Boosting&lt;/h1&gt;
+&lt;p&gt;Boosting consists of so-called basic classifiers usually. The final result of this model will be voted by these basic classifiers. It works as follows: we used the three models we introduce before as basic classifiers. Here we go! The training data is split into three training datasets &lt;script type=&quot;math/tex&quot;&gt;t_1, t_2, t_3&lt;/script&gt;.  The first basic model &lt;script type=&quot;math/tex&quot;&gt;m_1&lt;/script&gt; will be trained on &lt;script type=&quot;math/tex&quot;&gt;t_1&lt;/script&gt; at first. Then the trained &lt;script type=&quot;math/tex&quot;&gt;m_1&lt;/script&gt; is used for predicting the dataset &lt;script type=&quot;math/tex&quot;&gt;t_2&lt;/script&gt;. The incorrectly classified training data with the same size of training data in &lt;script type=&quot;math/tex&quot;&gt;t_2&lt;/script&gt; will be used for training &lt;script type=&quot;math/tex&quot;&gt;m_2&lt;/script&gt;. After it the dataset &lt;script type=&quot;math/tex&quot;&gt;t_3&lt;/script&gt; will as test data for &lt;script type=&quot;math/tex&quot;&gt;m_1&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;m_2&lt;/script&gt; predicted. The misclassified data will be then used for &lt;script type=&quot;math/tex&quot;&gt;m_3&lt;/script&gt;. For Boosting we used SVM, MLP, &lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;-NN as basic classifiers. The boosted results show as follows:&lt;/p&gt;
+
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/boosting.png&quot; width=&quot;55%&quot; /&gt;
+&lt;/div&gt;
+&lt;p&gt;The boosted MLP gives the best performance on validation data.&lt;/p&gt;
+
+&lt;h1&gt;AdaBoost&lt;/h1&gt;
+&lt;p&gt;AdaBoost uses a hyperparameter of number of basic classifier and the selected basic modal, i.e. we trained before. Our concepts is based on &lt;a href=&quot;http://ww.web.stanford.edu/~hastie/Papers/SII-2-3-A8-Zhu.pdf&quot;&gt;Multi-class AdaBoost&lt;/a&gt; and works as follows: this algorithm pays more attention for the misclassified samples during the training process. Each training sample has a initialized weight at the beginning of training and each basic model also has a confidence weight. As the model trains, the misclassification error will be calculated as well as the error of basic model. The weight of training samples is also updated  by using the confidence weight of classifiers. The weight should be normalized after each updating. The label of test object of this model will be given according to the confidence of basic models af last.&lt;/p&gt;
+
+&lt;p&gt;For AdaBoost I used the 3 MLP (plus HoG) as basic model. The boosted result is shown as in following figure.&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/adaboost.png&quot; width=&quot;55%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Some of numbers are clearly improved by AdaBoost and some are not good enough.&lt;/p&gt;
+
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;As we investigated, different features and models give us various classification performance. The next step is to combine all of them to find the best combo-candidate as our final classifier. The results are given as follows:&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/model_svm.png&quot; width=&quot;55%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/model_mlp.png&quot; width=&quot;55%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/model_knn.png&quot; width=&quot;55%&quot; /&gt;
+  &lt;div class=&quot;figcaption&quot;&gt; &lt;b&gt;Top: &lt;/b&gt; polynomial kernel with different feature extractions &lt;b&gt; Middle:  &lt;/b&gt;mlp with different feature extractions  &lt;b&gt; Botton: &lt;/b&gt; 5-NN with different feature extractions&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;As so far we introduced the classical pipeline of image recognition with machine learning. It looks canonically and works well in previous decades. The most critical point of final performance to classifying is the feature extraction, if we only consider the classification model is given in advance. In other words, it accquires very intensive expert knowledge on image processing. This should be reconsidered in feature.&lt;/p&gt;</content><author><name>Jian Xi</name></author><summary type="html">By now we got the training data. Which model is the best for our problem? We investigated the object recognition tasks such as street house number recognition, MNIST-benchdata classification and pedestrian detection etc. The models enjoy much privilege have been also considered in our problem.</summary></entry><entry><title type="html">Feature Extraction</title><link href="http://localhost:4000/main/2017/02/10/feature-extraction.html" rel="alternate" type="text/html" title="Feature Extraction" /><published>2017-02-10T13:47:25+01:00</published><updated>2017-02-10T13:47:25+01:00</updated><id>http://localhost:4000/main/2017/02/10/feature-extraction</id><content type="html" xml:base="http://localhost:4000/main/2017/02/10/feature-extraction.html">&lt;p&gt;As in   &lt;a href=&quot;/main/2017/01/08/pipeline-image-recognition.html&quot;&gt;Introduction&lt;/a&gt; stated, the feature ensures the variablity of template in same classes to be minimized and maximized in different classes. We used the feature extraction approches that quite widely in image recognition.&lt;/p&gt;
+&lt;h1&gt;Histogram&lt;/h1&gt;
+&lt;p&gt;Histogram is a very simple method. It uses the frequency of a pixel color. Now we just have the binary image, which consist of black and white pixel. For getting a better classification I also put the original image as s extra information at the end of histogram features, cause sometimes the features are quite similar, for instance, the histograms of  number 6 and 9 look quite same. The size of extra information should be optimized with cross validation approach. As validation result size in figure below we used 20x20 image as extra information to improve the accuracy. The histogram looks like:&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/6_hist.png&quot; width=&quot;10%&quot; /&gt;
+ &lt;div class=&quot;figcaption&quot;&gt; The vertical and horizontal histogram features &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;h1&gt;Local Binary Patterns&lt;/h1&gt;
+&lt;p&gt;Local Binary Patterns &lt;a href=&quot;http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.106.6396&quot;&gt;(LBP)&lt;/a&gt; is based on the gray images. After a image splices in to small cells, it uses a very simple strategy to extract features. It picks eight neighbors of a pixel and compares the gray values at central pixel with his neighbors. Than we get a binary pattern. The frequency of this number is then as feature processed. Here the size of each cell is a hyperparameter of this operator. It should be cross validated.&lt;/p&gt;
+
+&lt;h1&gt;Local Directional Patterns&lt;/h1&gt;
+&lt;p&gt;As the LBP is sensitive against noise, so I also had a look at the  local directional pattern &lt;a href=&quot;http://ccis2k.org/iajit/PDF/vol.9,no.4/2858-12.pdf&quot;&gt;(LDP)&lt;/a&gt;, which uses the kirsch mask to extract the top-K information that are important for a image. This kernel is defined as follows:&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/kirsch_maske.png&quot; width=&quot;75%&quot; /&gt;
+ &lt;div class=&quot;figcaption&quot;&gt; The kirsch mask in eight directions &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;This kernels pays more attention for the basic form information i.e. the edges or the corner etc., because those objects are less sensitive against the illumination changes. Here we can select the top-&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt; components as our features. The size of &lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt; should be investigated by cross validation.&lt;/p&gt;
+
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/baboon.png&quot; width=&quot;38%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/baboon_lbp.png&quot; width=&quot;38%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/baboon_noise.png&quot; width=&quot;38%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/baboon_ldp.png&quot; width=&quot;38%&quot; /&gt;
+ &lt;div class=&quot;figcaption&quot;&gt; &lt;b&gt;Top-left: &lt;/b&gt; original image &lt;b&gt; Top-right:  &lt;/b&gt;image after LBP Operator&lt;b&gt; Botton-left: &lt;/b&gt; image after LBP but with Gaussian noise&lt;b&gt; Bottom-Right: &lt;/b&gt; image after LDP Operator&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;As we can see, the contour of baboon are found by different ways. Especially the one with Guassian noise, at this image the basic face pary has been slightly blured out, whereas the LDP only find the most relevant information with top-3.&lt;/p&gt;
+
+&lt;h1&gt;Histogram of Oritend Gradient&lt;/h1&gt;
+&lt;p&gt;Histogram of Oritend Gradient &lt;a href=&quot;http://ieeexplore.ieee.org/document/1467360/?reload=true&quot;&gt;(HoG)&lt;/a&gt; plays a critical role in object recognition, for it provides a good possibility to describing a object or its form as directional gradients. This feature looks like&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/hog.png&quot; width=&quot;15%&quot; /&gt;
+&lt;/div&gt;
+&lt;p&gt;To get this featuer we can use this function:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Mat&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hog&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getHogDescriptor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;img&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;descriptors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;winSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The parameter winSize determins how big the image will be split into to calculate the HoG features.&lt;/p&gt;
+
+&lt;h1&gt;Scale Invariant Feature Transform&lt;/h1&gt;
+&lt;p&gt;Scale invariant feature transform &lt;a href=&quot;http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_sift_intro/py_sift_intro.html&quot;&gt;(SIFT)&lt;/a&gt; is also a gray image based approach. We also used this operator, cause sometimes the number images are distorted by shaking the camera. As this points the scale invariant feature transform takes a scale invariant feature from images. This algorithm detects some feature that are not good for identifying the object. For instance the both circles at the bottom of image a) in figure below, although this sort of ability for catching the unnecessary characters is very helpful for  template matching problem, which always spots the difference in images. Actually those poinst here detected are the results or difference of normalized Gaussian.&lt;/p&gt;
+
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/sift.png&quot; width=&quot;10%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;For accquiring the appropriate feature size we used corss validation. The image below shows the results.&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/featureparm_hist.png&quot; width=&quot;50%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/featureparm_lbp.png&quot; width=&quot;50%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/featureparm_ldp.png&quot; width=&quot;50%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/featureparm_hog.png&quot; width=&quot;50%&quot; /&gt;
+ &lt;div class=&quot;figcaption&quot;&gt; For investigating the parameter of feature extraction operator we used SVM as classification model. For training there were 20000 images, for validation 10000s.&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;SIFT works clearly worse in this case, so I don’t list it as compasion result. It’s shown clearly that HoG presents the best performance as so far. LDP shows different performance with different number of &lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;. It’s also imporved that the image plus histogram gives a good classification results.&lt;/p&gt;
+
+&lt;p&gt;After figuring out the best size of features for representing the original images, now we can feed this feature vectors as training data to training our classification models. It preceeds in following sections.&lt;/p&gt;</content><author><name>Jian Xi</name></author><summary type="html">As in Introduction stated, the feature ensures the variablity of template in same classes to be minimized and maximized in different classes. We used the feature extraction approches that quite widely in image recognition. Histogram Histogram is a very simple method. It uses the frequency of a pixel color. Now we just have the binary image, which consist of black and white pixel. For getting a better classification I also put the original image as s extra information at the end of histogram features, cause sometimes the features are quite similar, for instance, the histograms of number 6 and 9 look quite same. The size of extra information should be optimized with cross validation approach. As validation result size in figure below we used 20x20 image as extra information to improve the accuracy. The histogram looks like: The vertical and horizontal histogram features</summary></entry><entry><title type="html">Data Preprocessing</title><link href="http://localhost:4000/main/2017/01/09/data-preprocessing.html" rel="alternate" type="text/html" title="Data Preprocessing" /><published>2017-01-09T15:35:15+01:00</published><updated>2017-01-09T15:35:15+01:00</updated><id>http://localhost:4000/main/2017/01/09/data-preprocessing</id><content type="html" xml:base="http://localhost:4000/main/2017/01/09/data-preprocessing.html">&lt;h1&gt;Aside&lt;/h1&gt;
+&lt;p&gt;Data Preprocessing play a very essential role in the area of &lt;a href=&quot;https://en.wikipedia.org/wiki/Data_mining&quot;&gt;Knowledge Discovery&lt;/a&gt;.  Usually the data in our live world is not whiten yet. The images are sometimes very noised i.g. by taken under improperly illumination conditions or the image itself is not clean etc.&lt;/p&gt;
+
+&lt;h1&gt;Gaussian Filter&lt;/h1&gt;
+&lt;p&gt;Gaussian filter enables us to remove the unnecessary information in images and retain the information that might important for representing the image. The basic idea is we just use some convolution operations with given kernel (ususally a matrix) to blur the small structure in images out, whereas the rough-textured blobs will be preserved. Usually the input image is a single channel gray image &lt;script type=&quot;math/tex&quot;&gt;\mathbf{S}_i = (s_i(x, y))&lt;/script&gt;. The pixel points  &lt;script type=&quot;math/tex&quot;&gt;s_o(x, y)&lt;/script&gt;  in output  &lt;script type=&quot;math/tex&quot;&gt;\mathbf{S}_o&lt;/script&gt; is given by a convolution operation &lt;script type=&quot;math/tex&quot;&gt;\mathbf{K} = (h(u, v))&lt;/script&gt; with its neighbor point &lt;script type=&quot;math/tex&quot;&gt;s_i(x,y)&lt;/script&gt;. This operation is defined as follows:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{equation}
+s_o(x, y) = \frac{1}{m^2} \sum_{u=0}^{m-1} \sum_{v=0}^{m-1} s_i(x + k - u, y + k - v) \cdot h(u, v)
+\end{equation}&lt;/script&gt;
+
+&lt;p&gt;where &lt;script type=&quot;math/tex&quot;&gt;m&lt;/script&gt; the filter size of the filter &lt;script type=&quot;math/tex&quot;&gt;\mathbf{K}&lt;/script&gt;  and &lt;script type=&quot;math/tex&quot;&gt;k = \frac{m-1}{2}&lt;/script&gt;. Mostly it’s given by &lt;script type=&quot;math/tex&quot;&gt;m = 3, 5, 7, \dots&lt;/script&gt;.&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/lena_gd.png&quot; width=&quot;45%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/lena_g.png&quot; width=&quot;45%&quot; /&gt;
+  &lt;div class=&quot;figcaption&quot;&gt;&lt;b&gt;Left: &lt;/b&gt; original image &lt;b&gt;Right: &lt;/b&gt; the image after Gaussian filter&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;How much information will be blured depends closely on the size of filter. It’s a hyperparameter.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Mat&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cv&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GaussianBlur&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;img&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h1&gt;Digitalization&lt;/h1&gt;
+&lt;p&gt;Some feature extraction needs binary image for extracting features such as histogram. So the original images should be digitalized, from which we got black and white points. Here we used &lt;a href=&quot;http://ijarcet.org/wp-content/uploads/IJARCET-VOL-2-ISSUE-2-387-389.pdf&quot;&gt;Otsu&lt;/a&gt; method that clusters the pixels according to a threshold. The digitalized image looks like in figure below:&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/otsu.png&quot; width=&quot;5%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/otsu_o.png&quot; width=&quot;5%&quot; /&gt;
+  &lt;div class=&quot;figcaption&quot;&gt;&lt;b&gt;Left:&lt;/b&gt;original image&lt;b&gt;Right:&lt;/b&gt; the result after Otsu clustering&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;To get this image, we can use this function given by OpenCV&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//thresholding to get a binary image
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cv&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;threshold&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;THRESH_BINARY&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CV_THRESH_OTSU&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h1&gt;Normalization&lt;/h1&gt;
+&lt;p&gt;In our case the meters have various size. So the cropped images have also different size. The image ratio should be normalized without information lost, cause it also influence on the classification results.&lt;/p&gt;
+
+&lt;h1&gt;Principle Component Analysis&lt;/h1&gt;
+&lt;p&gt;Principle Component Analysis &lt;a href=&quot;https://en.wikipedia.org/wiki/Principal_component_analysis&quot;&gt;(PCA)&lt;/a&gt; is a widely used dimension reduction method in data preprocessing or data clustering area. The basic idea behind this algorithm is eigenvalue decomposition. We always search a direction, when the original data onto this direction or direction of a vector the variance of the projected data is maximized. In other words, the data is approximated as the data lying in this direction or space. If we have an unit vector $u$ and a data point &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;, the length of the project of &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; onto &lt;script type=&quot;math/tex&quot;&gt;u&lt;/script&gt; is &lt;script type=&quot;math/tex&quot;&gt;x^T u&lt;/script&gt;. Also this projection onto &lt;script type=&quot;math/tex&quot;&gt;u&lt;/script&gt; is also the distance &lt;script type=&quot;math/tex&quot;&gt;x^T u&lt;/script&gt; from origin. Therefore we maximize the variance of projection by choosing unit-length &lt;script type=&quot;math/tex&quot;&gt;u&lt;/script&gt; as in following Eq.:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{equation} 
+	\begin{split}
+	\frac{1}{m} \sum_{i=1}^{m}(x_i^{T} u)^2 &amp;= \frac{1}{m} \sum_{i=1}^{m} u^T x_i x_i^T u \\
+	&amp;=u^T \left( \frac{1}{m} \sum_{i=1}^{m} x_ix_i^T \right) u,
+	\end{split}
+\end{equation} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;the term in parentheses is actually the covariance  matrix of original data. After solving this optimization problem we got the principle eigenvalue of covariance matrix &lt;script type=&quot;math/tex&quot;&gt;\Sigma = \frac{1}{m} \sum_{i=1}^{m} x_ix_i^T&lt;/script&gt;.  We can project our data onto this eigenvalue vector &lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+u_1, \dots, u_k, k &lt; n %]]&gt;&lt;/script&gt;, where &lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt; the dimension of eigenvector and original data. The projected data is calculated as follows:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{equation}
+y_i = \left[ \begin{array}{c}
+ u_1^Tx_i \\
+ u_2^Tx_i \\
+ \vdots \\
+ u_k^Tx_i
+ \end{array} \right] \in \mathbb{R}^k.
+\end{equation}&lt;/script&gt;
+
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/pca_o.png&quot; width=&quot;50%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/pca_r.png&quot; width=&quot;50%&quot; /&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/pca_e.png&quot; width=&quot;50%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The mosttop image is normalized by subtracting the mean image. The image after dimension reduction is shown in middle.The bottom image shows the 144 eigenvalues.&lt;/p&gt;
+
+&lt;h1&gt;Whiten&lt;/h1&gt;
+&lt;p&gt;The only difference between PCA and &lt;a href=&quot;http://ufldl.stanford.edu/tutorial/unsupervised/PCAWhitening/&quot;&gt;Whitening&lt;/a&gt; is that the projected data is divided by the square root of eigenvalues.
+&lt;script type=&quot;math/tex&quot;&gt;\begin{equation}
+y_{w} = \frac{y_i}{\sqrt{\lambda_i}}
+\end{equation}&lt;/script&gt;&lt;/p&gt;</content><author><name>Jian Xi</name></author><summary type="html">Aside Data Preprocessing play a very essential role in the area of Knowledge Discovery. Usually the data in our live world is not whiten yet. The images are sometimes very noised i.g. by taken under improperly illumination conditions or the image itself is not clean etc.</summary></entry><entry><title type="html">Machine Learning in Visual Recognition</title><link href="http://localhost:4000/main/2017/01/08/pipeline-image-recognition.html" rel="alternate" type="text/html" title="Machine Learning in Visual Recognition" /><published>2017-01-08T04:20:15+01:00</published><updated>2017-01-08T04:20:15+01:00</updated><id>http://localhost:4000/main/2017/01/08/pipeline-image-recognition</id><content type="html" xml:base="http://localhost:4000/main/2017/01/08/pipeline-image-recognition.html">&lt;h1&gt;Introduce&lt;/h1&gt;
+&lt;p&gt;Machine Learning can be used in various different areas. In this project I’ll show how machine learing can be applied in the image recognition. Specifically, it will be introduced how the electricity meter will be automatically read. This project was implemented with OpenCV. Normally the gas or electricity meter looks like in the following figure.&lt;/p&gt;
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/plate.png&quot; width=&quot;50%&quot; /&gt;
+  &lt;div class=&quot;figcaption&quot;&gt;Electricity plate&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Firstly the image area in yellow box will be detected, after it each single number image will be segmented. At last the number image will be classified. This is the basic concept. Now let’s go throught it out setp by step. In this project I’ll show the last part of this work as a image recognition task. The first and two parts belong to object detection and will be postponed in following blogs.&lt;/p&gt;
+
+&lt;h1&gt;Pipeline of Visual Recognition&lt;/h1&gt;
+&lt;p&gt;In the classical computer vision or OCR problem, we usually works as follows:&lt;/p&gt;
+&lt;h2&gt; Data preprocessing&lt;/h2&gt;
+&lt;p&gt;The training data (images) will be normlized, i.e. noise reduce, ratio adjustment etc. Ususally the images have different illumination, it can also be processed in this step. It requires the image processing approaches in this process.&lt;/p&gt;
+
+&lt;h2&gt; Feature Extraction&lt;/h2&gt;
+&lt;p&gt;After preprocessing the necessary information should be retained as much as possible, cause this information is very importent for training our models. The goal of feature extraction is to make the variablity of templates in the same classes minimized and maximied in different classes. In this prcoess the necessary knowledge of image processing should be required.&lt;/p&gt;
+
+&lt;h2&gt; Model Tranining&lt;/h2&gt;
+&lt;p&gt;The extracted relevant information will be used for training classification model. The machine learning models have different performance variously. So the model should be fairly evluated under some criteria.&lt;/p&gt;
+
+&lt;p&gt;The following sections will present each part of this pipeline and you’ll get a picture how this state of art process works separately.&lt;/p&gt;</content><author><name>Jian Xi</name></author><summary type="html">Introduce Machine Learning can be used in various different areas. In this project I’ll show how machine learing can be applied in the image recognition. Specifically, it will be introduced how the electricity meter will be automatically read. This project was implemented with OpenCV. Normally the gas or electricity meter looks like in the following figure. Electricity plate</summary></entry></feed>

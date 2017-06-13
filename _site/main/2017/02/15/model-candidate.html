@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <head>
+  <meta charset="UTF-8">
+  <title>Deep Convolutoin Neural Network</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#157878">
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="/css/cayman.css">
+</head>
+
+  <body>
+    <section class="page-header">
+  <h1 class="project-name">Deep Convolutoin Neural Network</h1>
+  <h2 class="project-tagline"></h2>
+  <!--
+  <a href="#" class="btn">View on GitHub</a>
+  <a href="#" class="btn">Download .zip</a>
+  <a href="#" class="btn">Download .tar.gz</a>
+  -->
+</section>
+
+    <section class="main-content">
+      
+      <h2>Model Candidate</h2>
+<p class="meta">15 Feb 2017</p>
+
+<p>By now we got the training data. Which model is the best for our problem? We investigated the object recognition tasks such as street house number recognition, MNIST-benchdata classification and pedestrian detection etc. The models enjoy much privilege have been also considered in our problem.</p>
+
+<h1>Support Vector Machine</h1>
+<p>Support Vector Machine <a href="https://en.wikipedia.org/wiki/Support_vector_machine">(SVM)</a> presents a very easy understandable way for classification problems. The basis idea of it is derived from linear classifier. We want to find the support vectors that maximize the margin between two classes, which is depicted as follows:</p>
+<div class="fig figcenter fighighlight">
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/svm_decision_boundary.png" width="55%" />
+ <div class="figcaption"> Support Vectors and the optimal hyperplane </div>
+</div>
+<p>The dash line represents the optimal decision boudary between class <script type="math/tex">c_1</script> and <script type="math/tex">c_2</script>, whereas solide line is just normal decision boundary that sepaerates them, but in a perfect way. Because our image class is a nonlinear classification problem, which means the data in input space is nonlinear separable. For solving this problem wen can map the data in input space into feature space, where the data is linear separable. The <a href="https://www.pearson.com/us/higher-education/program/Haykin-Neural-Networks-and-Learning-Machines-3rd-Edition/PGM320370.html">Kernel</a> enable the mapping the data from input space to feature space, which is usually a doc product operation. Therefore sometimes kernel method is a alias of SVM. The ability of different kernels to classification varies, so we need to find out which the best kernel candidate for our problem. Ususally the polynomial kernel delieveries a good performance as in the other cases.</p>
+<div class="fig figcenter fighighlight">
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/modelparam_svm.png" width="55%" />
+</div>
+
+<h1>Multiple-layer Perceptron</h1>
+
+<p>Multiple layer perceptron (MLP) is inspired by the biological neural system. The network input function accept the input from the outside of the perceptron and continuously propagates the linear combination of inputs and their weights to the activation function. The classification will be then executed according to the comparing the activation function’s output with an threshold values. For solving the nonlinear classification problem we built multiple layer perceptrons, whereby the neural perceptrons in input layers read the data. Than activation process are aroused in each perceptron. The neural perceptron in different layers are connected synapticly and not connected in the same layers.</p>
+
+<p>The net works generally in two phases:
+<strong>Forward propagation:</strong>, in which the function signals are propagated forwards from layer to layer till it reach the output layers. In output layer we usually get a score for each class. According to this scores we just send  the adjustment message backwards layer to later, which is the <strong>Backward propagation</strong>, in this process the parameters will be adjusted according to the classification scores. This is actually sometimes called <strong>blame assignment</strong> problem. It means how the errors will be assigned to where it probably aroused potentially. 
+The structure of the nets or the parameters such as the weights of neurons, the number of hidden layers are very important for the final classification results. Theses parameters should be investigated by validation. As the validation resuts show in the figure,</p>
+<div class="fig figcenter fighighlight">
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/modelparam_mlp.png" width="55%" />
+</div>
+
+<p>the number of neurons in hidden layers play a role for final classification accuracy. Descripe all complicated models, normally the 3 layers MLP (without counting input layers) is the best structure for classification problem.</p>
+
+<h1>k-Nearest Neighbor</h1>
+<p><script type="math/tex">k</script>-Nearest Neighbor <a href="https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm">KNN</a> is a lazying methods.  What we need for this method is just a hyperparamter of <script type="math/tex">k</script> and a labeled dataset. When a test object comes, this algorithm calculates the similarity of this object between all training objects by using some distance measure approaches such as euclidean distance. As said before, this algorithm requires a large memory resource on demand for loading the all training data, that’s why it’s called lazying learning method. Further more it takes much longer time than other models during prediction or classification. By comparing the similarity between test object and all training data we’ll get a dataset, which is the <script type="math/tex">k</script>-nearest neighbor of test object. The final label of test object is the most frequent labels in this dataset. After validation we got the $5-$ nearest neighbor brings the best accuracy for our problem as shows as follows:</p>
+<div class="fig figcenter fighighlight">
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/modelparam_knn.png" width="55%" />
+</div>
+
+<p>As you can see either SVM, MLP or KNN works individually. Is it possible that we can combine the basic single model together to get a better performance? By using this idea we can boost the basic models or adaboost a single model many times.</p>
+
+<h1>Boosting</h1>
+<p>Boosting consists of so-called basic classifiers usually. The final result of this model will be voted by these basic classifiers. It works as follows: we used the three models we introduce before as basic classifiers. Here we go! The training data is split into three training datasets <script type="math/tex">t_1, t_2, t_3</script>.  The first basic model <script type="math/tex">m_1</script> will be trained on <script type="math/tex">t_1</script> at first. Then the trained <script type="math/tex">m_1</script> is used for predicting the dataset <script type="math/tex">t_2</script>. The incorrectly classified training data with the same size of training data in <script type="math/tex">t_2</script> will be used for training <script type="math/tex">m_2</script>. After it the dataset <script type="math/tex">t_3</script> will as test data for <script type="math/tex">m_1</script> and <script type="math/tex">m_2</script> predicted. The misclassified data will be then used for <script type="math/tex">m_3</script>. For Boosting we used SVM, MLP, <script type="math/tex">k</script>-NN as basic classifiers. The boosted results show as follows:</p>
+
+<div class="fig figcenter fighighlight">
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/boosting.png" width="55%" />
+</div>
+<p>The boosted MLP gives the best performance on validation data.</p>
+
+<h1>AdaBoost</h1>
+<p>AdaBoost uses a hyperparameter of number of basic classifier and the selected basic modal, i.e. we trained before. Our concepts is based on <a href="http://ww.web.stanford.edu/~hastie/Papers/SII-2-3-A8-Zhu.pdf">Multi-class AdaBoost</a> and works as follows: this algorithm pays more attention for the misclassified samples during the training process. Each training sample has a initialized weight at the beginning of training and each basic model also has a confidence weight. As the model trains, the misclassification error will be calculated as well as the error of basic model. The weight of training samples is also updated  by using the confidence weight of classifiers. The weight should be normalized after each updating. The label of test object of this model will be given according to the confidence of basic models af last.</p>
+
+<p>For AdaBoost I used the 3 MLP (plus HoG) as basic model. The boosted result is shown as in following figure.</p>
+<div class="fig figcenter fighighlight">
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/adaboost.png" width="55%" />
+</div>
+
+<p>Some of numbers are clearly improved by AdaBoost and some are not good enough.</p>
+
+<h1>Conclusion</h1>
+<p>As we investigated, different features and models give us various classification performance. The next step is to combine all of them to find the best combo-candidate as our final classifier. The results are given as follows:</p>
+<div class="fig figcenter fighighlight">
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/model_svm.png" width="55%" />
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/model_mlp.png" width="55%" />
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/model_knn.png" width="55%" />
+  <div class="figcaption"> <b>Top: </b> polynomial kernel with different feature extractions <b> Middle:  </b>mlp with different feature extractions  <b> Botton: </b> 5-NN with different feature extractions</div>
+</div>
+
+<p>As so far we introduced the classical pipeline of image recognition with machine learning. It looks canonically and works well in previous decades. The most critical point of final performance to classifying is the feature extraction, if we only consider the classification model is given in advance. In other words, it accquires very intensive expert knowledge on image processing. This should be reconsidered in feature.</p>
+
+
+
+      <footer class="site-footer">
+  <span class="site-footer-owner"><a href="http://localhost:4000">Deep Convolutoin Neural Network</a> is maintained by <a href="https://github.com/keeperovswords">Jian Xi</a>.</span>
+  <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+</footer>
+
+
+    </section>
+
+  </body>
+</html>

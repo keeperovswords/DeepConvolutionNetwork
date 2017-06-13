@@ -1,0 +1,78 @@
+---
+layout: post
+title:  "Feature Extraction"
+date:   2017-02-10 18:47:25 +0600
+categories: main
+---
+As in   [Introduction]({{ site.baseurl }}{% post_url 2017-01-08-pipeline-image-recognition  %}) stated, the feature ensures the variablity of template in same classes to be minimized and maximized in different classes. We used the feature extraction approches that quite widely in image recognition. 
+<h1>Histogram</h1> 
+Histogram is a very simple method. It uses the frequency of a pixel color. Now we just have the binary image, which consist of black and white pixel. For getting a better classification I also put the original image as s extra information at the end of histogram features, cause sometimes the features are quite similar, for instance, the histograms of  number 6 and 9 look quite same. The size of extra information should be optimized with cross validation approach. As validation result size in figure below we used 20x20 image as extra information to improve the accuracy. The histogram looks like:
+<div class="fig figcenter fighighlight">
+  <img src="{{ site.github.url }}/assets/6_hist.png" width="10%">
+ <div class="figcaption"> The vertical and horizontal histogram features </div>
+</div>
+
+
+<h1>Local Binary Patterns</h1>
+Local Binary Patterns [(LBP)][lbp-link] is based on the gray images. After a image splices in to small cells, it uses a very simple strategy to extract features. It picks eight neighbors of a pixel and compares the gray values at central pixel with his neighbors. Than we get a binary pattern. The frequency of this number is then as feature processed. Here the size of each cell is a hyperparameter of this operator. It should be cross validated.
+
+<h1>Local Directional Patterns</h1>
+As the LBP is sensitive against noise, so I also had a look at the  local directional pattern [(LDP)][ldp-link], which uses the kirsch mask to extract the top-K information that are important for a image. This kernel is defined as follows:
+<div class="fig figcenter fighighlight">
+  <img src="{{ site.github.url }}/assets/kirsch_maske.png" width="75%">
+ <div class="figcaption"> The kirsch mask in eight directions </div>
+</div>
+This kernels pays more attention for the basic form information i.e. the edges or the corner etc., because those objects are less sensitive against the illumination changes. Here we can select the top-$$k$$ components as our features. The size of $$k$$ should be investigated by cross validation.
+
+<div class="fig figcenter fighighlight">
+  <img src="{{ site.github.url }}/assets/baboon.png" width="38%">
+  <img src="{{ site.github.url }}/assets/baboon_lbp.png" width="38%">
+  <img src="{{ site.github.url }}/assets/baboon_noise.png" width="38%">
+  <img src="{{ site.github.url }}/assets/baboon_ldp.png" width="38%">
+ <div class="figcaption"> <b>Top-left: </b> original image <b> Top-right:  </b>image after LBP Operator<b> Botton-left: </b> image after LBP but with Gaussian noise<b> Bottom-Right: </b> image after LDP Operator</div>
+</div>
+As we can see, the contour of baboon are found by different ways. Especially the one with Guassian noise, at this image the basic face pary has been slightly blured out, whereas the LDP only find the most relevant information with top-3.
+
+<h1>Histogram of Oritend Gradient</h1>
+Histogram of Oritend Gradient [(HoG)][hog-link] plays a critical role in object recognition, for it provides a good possibility to describing a object or its form as directional gradients. This feature looks like 
+<div class="fig figcenter fighighlight">
+  <img src="{{ site.github.url }}/assets/hog.png" width="15%">
+</div>
+To get this featuer we can use this function:
+{% highlight c++ %}
+...
+Mat hog = getHogDescriptor(img, descriptors, winSize);
+...
+{% endhighlight %}
+The parameter winSize determins how big the image will be split into to calculate the HoG features.
+
+<h1>Scale Invariant Feature Transform</h1> 
+Scale invariant feature transform [(SIFT)][sift-link] is also a gray image based approach. We also used this operator, cause sometimes the number images are distorted by shaking the camera. As this points the scale invariant feature transform takes a scale invariant feature from images. This algorithm detects some feature that are not good for identifying the object. For instance the both circles at the bottom of image a) in figure below, although this sort of ability for catching the unnecessary characters is very helpful for  template matching problem, which always spots the difference in images. Actually those poinst here detected are the results or difference of normalized Gaussian.
+  
+<div class="fig figcenter fighighlight">
+  <img src="{{ site.github.url }}/assets/sift.png" width="10%">
+</div>
+
+For accquiring the appropriate feature size we used corss validation. The image below shows the results.
+<div class="fig figcenter fighighlight">
+  <img src="{{ site.github.url }}/assets/featureparm_hist.png" width="50%">
+  <img src="{{ site.github.url }}/assets/featureparm_lbp.png" width="50%">
+  <img src="{{ site.github.url }}/assets/featureparm_ldp.png" width="50%">
+  <img src="{{ site.github.url }}/assets/featureparm_hog.png" width="50%">
+ <div class="figcaption"> For investigating the parameter of feature extraction operator we used SVM as classification model. For training there were 20000 images, for validation 10000s.</div>
+</div>
+
+<h2>Conclusion</h2>
+SIFT works clearly worse in this case, so I don't list it as compasion result. It's shown clearly that HoG presents the best performance as so far. LDP shows different performance with different number of $$k$$. It's also imporved that the image plus histogram gives a good classification results. 
+
+After figuring out the best size of features for representing the original images, now we can feed this feature vectors as training data to training our classification models. It preceeds in following sections.
+
+
+
+
+
+
+[lbp-link]:http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.106.6396
+[ldp-link]:http://ccis2k.org/iajit/PDF/vol.9,no.4/2858-12.pdf
+[hog-link]:http://ieeexplore.ieee.org/document/1467360/?reload=true
+[sift-link]:http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_sift_intro/py_sift_intro.html

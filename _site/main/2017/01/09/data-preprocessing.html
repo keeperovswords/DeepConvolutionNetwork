@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <head>
+  <meta charset="UTF-8">
+  <title>Deep Convolutoin Neural Network</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#157878">
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="/css/cayman.css">
+</head>
+
+  <body>
+    <section class="page-header">
+  <h1 class="project-name">Deep Convolutoin Neural Network</h1>
+  <h2 class="project-tagline"></h2>
+  <!--
+  <a href="#" class="btn">View on GitHub</a>
+  <a href="#" class="btn">Download .zip</a>
+  <a href="#" class="btn">Download .tar.gz</a>
+  -->
+</section>
+
+    <section class="main-content">
+      
+      <h2>Data Preprocessing</h2>
+<p class="meta">09 Jan 2017</p>
+
+<h1>Aside</h1>
+<p>Data Preprocessing play a very essential role in the area of <a href="https://en.wikipedia.org/wiki/Data_mining">Knowledge Discovery</a>.  Usually the data in our live world is not whiten yet. The images are sometimes very noised i.g. by taken under improperly illumination conditions or the image itself is not clean etc.</p>
+
+<h1>Gaussian Filter</h1>
+<p>Gaussian filter enables us to remove the unnecessary information in images and retain the information that might important for representing the image. The basic idea is we just use some convolution operations with given kernel (ususally a matrix) to blur the small structure in images out, whereas the rough-textured blobs will be preserved. Usually the input image is a single channel gray image <script type="math/tex">\mathbf{S}_i = (s_i(x, y))</script>. The pixel points  <script type="math/tex">s_o(x, y)</script>  in output  <script type="math/tex">\mathbf{S}_o</script> is given by a convolution operation <script type="math/tex">\mathbf{K} = (h(u, v))</script> with its neighbor point <script type="math/tex">s_i(x,y)</script>. This operation is defined as follows:</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+s_o(x, y) = \frac{1}{m^2} \sum_{u=0}^{m-1} \sum_{v=0}^{m-1} s_i(x + k - u, y + k - v) \cdot h(u, v)
+\end{equation}</script>
+
+<p>where <script type="math/tex">m</script> the filter size of the filter <script type="math/tex">\mathbf{K}</script>  and <script type="math/tex">k = \frac{m-1}{2}</script>. Mostly it’s given by <script type="math/tex">m = 3, 5, 7, \dots</script>.</p>
+<div class="fig figcenter fighighlight">
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/lena_gd.png" width="45%" />
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/lena_g.png" width="45%" />
+  <div class="figcaption"><b>Left: </b> original image <b>Right: </b> the image after Gaussian filter</div>
+</div>
+
+<p>How much information will be blured depends closely on the size of filter. It’s a hyperparameter.</p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="p">...</span>
+<span class="n">Mat</span> <span class="n">tmp</span><span class="p">;</span>
+<span class="n">cv</span><span class="o">::</span><span class="n">GaussianBlur</span><span class="p">(</span> <span class="n">img</span><span class="p">,</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">cv</span><span class="o">::</span><span class="n">Size</span><span class="p">(</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span> <span class="p">),</span> <span class="mi">0</span> <span class="p">);</span>
+<span class="p">...</span></code></pre></figure>
+
+<h1>Digitalization</h1>
+<p>Some feature extraction needs binary image for extracting features such as histogram. So the original images should be digitalized, from which we got black and white points. Here we used <a href="http://ijarcet.org/wp-content/uploads/IJARCET-VOL-2-ISSUE-2-387-389.pdf">Otsu</a> method that clusters the pixels according to a threshold. The digitalized image looks like in figure below:</p>
+<div class="fig figcenter fighighlight">
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/otsu.png" width="5%" />
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/otsu_o.png" width="5%" />
+  <div class="figcaption"><b>Left:</b>original image<b>Right:</b> the result after Otsu clustering</div>
+</div>
+<p>To get this image, we can use this function given by OpenCV</p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="p">...</span>
+<span class="c1">//thresholding to get a binary image
+</span><span class="n">cv</span><span class="o">::</span><span class="n">threshold</span><span class="p">(</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">tmp</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="n">THRESH_BINARY</span> <span class="o">+</span> <span class="n">CV_THRESH_OTSU</span> <span class="p">);</span>
+<span class="p">...</span></code></pre></figure>
+
+<h1>Normalization</h1>
+<p>In our case the meters have various size. So the cropped images have also different size. The image ratio should be normalized without information lost, cause it also influence on the classification results.</p>
+
+<h1>Principle Component Analysis</h1>
+<p>Principle Component Analysis <a href="https://en.wikipedia.org/wiki/Principal_component_analysis">(PCA)</a> is a widely used dimension reduction method in data preprocessing or data clustering area. The basic idea behind this algorithm is eigenvalue decomposition. We always search a direction, when the original data onto this direction or direction of a vector the variance of the projected data is maximized. In other words, the data is approximated as the data lying in this direction or space. If we have an unit vector $u$ and a data point <script type="math/tex">x</script>, the length of the project of <script type="math/tex">x</script> onto <script type="math/tex">u</script> is <script type="math/tex">x^T u</script>. Also this projection onto <script type="math/tex">u</script> is also the distance <script type="math/tex">x^T u</script> from origin. Therefore we maximize the variance of projection by choosing unit-length <script type="math/tex">u</script> as in following Eq.:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation} 
+	\begin{split}
+	\frac{1}{m} \sum_{i=1}^{m}(x_i^{T} u)^2 &= \frac{1}{m} \sum_{i=1}^{m} u^T x_i x_i^T u \\
+	&=u^T \left( \frac{1}{m} \sum_{i=1}^{m} x_ix_i^T \right) u,
+	\end{split}
+\end{equation} %]]></script>
+
+<p>the term in parentheses is actually the covariance  matrix of original data. After solving this optimization problem we got the principle eigenvalue of covariance matrix <script type="math/tex">\Sigma = \frac{1}{m} \sum_{i=1}^{m} x_ix_i^T</script>.  We can project our data onto this eigenvalue vector <script type="math/tex">% <![CDATA[
+u_1, \dots, u_k, k < n %]]></script>, where <script type="math/tex">k</script> and <script type="math/tex">n</script> the dimension of eigenvector and original data. The projected data is calculated as follows:</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+y_i = \left[ \begin{array}{c}
+ u_1^Tx_i \\
+ u_2^Tx_i \\
+ \vdots \\
+ u_k^Tx_i
+ \end{array} \right] \in \mathbb{R}^k.
+\end{equation}</script>
+
+<div class="fig figcenter fighighlight">
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/pca_o.png" width="50%" />
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/pca_r.png" width="50%" />
+  <img src="http://github.com/pages/keeperovswords/DeepConvolutionNetwork/assets/pca_e.png" width="50%" />
+</div>
+
+<p>The mosttop image is normalized by subtracting the mean image. The image after dimension reduction is shown in middle.The bottom image shows the 144 eigenvalues.</p>
+
+<h1>Whiten</h1>
+<p>The only difference between PCA and <a href="http://ufldl.stanford.edu/tutorial/unsupervised/PCAWhitening/">Whitening</a> is that the projected data is divided by the square root of eigenvalues.
+<script type="math/tex">\begin{equation}
+y_{w} = \frac{y_i}{\sqrt{\lambda_i}}
+\end{equation}</script></p>
+
+
+
+      <footer class="site-footer">
+  <span class="site-footer-owner"><a href="http://localhost:4000">Deep Convolutoin Neural Network</a> is maintained by <a href="https://github.com/keeperovswords">Jian Xi</a>.</span>
+  <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+</footer>
+
+
+    </section>
+
+  </body>
+</html>
