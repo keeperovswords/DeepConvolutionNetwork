@@ -27,37 +27,277 @@ target_link_libraries( cnn ${OpenCV_LIBS} )
 
 <h1>test</h1>
 
-<h2>confusion matrix</h2>
+<h2>Predicting</h2>
 The testing result looks as follows:
 
 ++++++++++++++>Predicting<++++++++++++++
-[Correctly Classified Instances:	9369	0.9369]
-[Incorrectly Classified Instances:	631	0.0631]
-[Total Number of Instances:	10000]
+| Total Samples | Correctly Classified  | Incorrectly Classified  |
+| ------------- |:-------------:| -----:|
+| 10000         | 9369          | 631   |
+Prediction accuracy: 93.69% in 10000s Samples
 
-====Detailed Accuracy By Class====
-	Class		TP Rate		FP Rate		Precision		Recall		F-Measure		ROC Area		
-		0 		0.984 		0.006 		0.951 		0.984 		0.967
-		1 		0.978 		0.003 		0.973 		0.978 		0.975
-		2 		0.920 		0.008 		0.932 		0.920 		0.926
-		3 		0.929 		0.008 		0.928 		0.929 		0.928
-		4 		0.944 		0.009 		0.917 		0.944 		0.930
-		5 		0.904 		0.005 		0.945 		0.904 		0.924
-		6 		0.962 		0.006 		0.942 		0.962 		0.952
-		7 		0.922 		0.007 		0.937 		0.922 		0.929
-		8 		0.919 		0.007 		0.935 		0.919 		0.927
-		9 		0.902 		0.010 		0.906 		0.902 		0.904
+<table>
+  <tbody>
+    <tr>
+      <th>Class</th>
+      <th align="center">TP Rate</th>
+      <th align="right">FP Rate</th>
+      <th align="right">Precision</th>
+      <th align="right">Recall</th>
+      <th align="right">F-Measure</th>
+      <th align="right">ROC Area</th>
 
-====Confusion Matrix====
-		0		1		2		3		4		5		6		7		8		9	<------Labeled as
-| 0 |	964		0		1		1		0		3		6		2		2		1		980
-| 1 |	0		1110		4		2		0		0		4		1		14		0		1135
-| 2 |	7		4		949		14		9		2		10		17		14		6		1032
-| 3 |	5		1		18		938		0		18		2		12		8		8		1010
-| 4 |	1		2		4		1		927		0		12		4		3		28		982
-| 5 |	10		2		2		26		6		806		15		7		11		7		892
-| 6 |	9		3		3		2		9		7		922		1		2		0		958
-| 7 |	0		8		28		7		7		1		0		948		2		27		1028
-| 8 |	8		5		4		10		10		9		8		8		895		17		974
-| 9 |	10		6		5		10		43		7		0		12		6		910		1009
+    </tr>
+    <tr>
+      <td>0</td>
+      <td align="center">0.984</td>
+      <td align="center">0.006</td>
+      <td align="center">0.951</td>
+      <td align="center">0.984</td>
+      <td align="center">0.967</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td align="center">0.978</td>
+      <td align="center">0.003</td>
+      <td align="center">0.973</td>
+      <td align="center">0.978</td>
+      <td align="center">0.975</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td align="center">0.920</td>
+      <td align="center">0.008</td>
+      <td align="center">0.932</td>
+      <td align="center">0.920</td>
+      <td align="center">0.926</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td align="center">0.929</td>
+      <td align="center">0.008</td>
+      <td align="center">0.928</td>
+      <td align="center">0.929</td>
+      <td align="center">0.928</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td align="center">0.944</td>
+      <td align="center">0.009</td>
+      <td align="center">0.917</td>
+      <td align="center">0.944</td>
+      <td align="center">0.930</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td align="center">0.904</td>
+      <td align="center">0.005</td>
+      <td align="center">0.945</td>
+      <td align="center">0.904</td>
+      <td align="center">0.924</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td align="center">0.962</td>
+      <td align="center">0.006</td>
+      <td align="center">0.942</td>
+      <td align="center">0.962</td>
+      <td align="center">0.952</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td align="center">0.922</td>
+      <td align="center">0.007</td>
+      <td align="center">0.937</td>
+      <td align="center">0.922</td>
+      <td align="center">0.929</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td align="center">0.919</td>
+      <td align="center">0.007</td>
+      <td align="center">0.935</td>
+      <td align="center">0.919</td>
+      <td align="center">0.927</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td align="center">0.902 </td>
+      <td align="center">0.010</td>
+      <td align="center">0.906</td>
+      <td align="center">0.902</td>
+      <td align="center">0.904</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>confusion matrix</h2>
+<table>
+  <tbody>
+    <tr>
+      <th></th>
+      <th>0</th>
+      <th align="center">1</th>
+      <th align="right">2</th>
+      <th align="right">3</th>
+      <th align="right">4</th>
+      <th align="right">5</th>
+      <th align="right">6</th>
+      <th align="right">7</th>
+      <th align="right">8</th>
+      <th align="right">9</th>
+      <th align="right">labled as</th>
+    </tr>
+    <tr>
+      <td>0</td>
+      <td align="center">964</td>
+      <td align="center">0</td>
+      <td align="center">1</td>
+      <td align="center">1</td>
+      <td align="center">0</td>
+      <td align="center">3</td>
+      <td align="center">6</td>
+      <td align="center">2</td>
+      <td align="center">2</td>
+      <td align="center">1</td>
+      <td align="center">980</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td align="center">0</td>
+      <td align="center">1110</td>
+      <td align="center">4</td>
+      <td align="center">2</td>
+      <td align="center">0</td>
+      <td align="center">0</td>
+      <td align="center">4</td>
+      <td align="center">1</td>
+      <td align="center">14</td>
+      <td align="center">1</td>
+      <td align="center">1135</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td align="center">7</td>
+      <td align="center">4</td>
+      <td align="center">949</td>
+      <td align="center">14</td>
+      <td align="center">9</td>
+      <td align="center">2</td>
+      <td align="center">10</td>
+      <td align="center">17</td>
+      <td align="center">14</td>
+      <td align="center">6</td>
+      <td align="center">1032</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td align="center">5</td>
+      <td align="center">1</td>
+      <td align="center">18</td>
+      <td align="center">938</td>
+      <td align="center">0</td>
+      <td align="center">18</td>
+      <td align="center">2</td>
+      <td align="center">12</td>
+      <td align="center">8</td>
+      <td align="center">8</td>
+      <td align="center">1010</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td align="center">1</td>
+      <td align="center">2</td>
+      <td align="center">4</td>
+      <td align="center">1</td>
+      <td align="center">927</td>
+      <td align="center">0</td>
+      <td align="center">12</td>
+      <td align="center">4</td>
+      <td align="center">3</td>
+      <td align="center">28</td>
+      <td align="center">982</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td align="center">10</td>
+      <td align="center">2</td>
+      <td align="center">2</td>
+      <td align="center">26</td>
+      <td align="center">6</td>
+      <td align="center">806</td>
+      <td align="center">15</td>
+      <td align="center">7</td>
+      <td align="center">11</td>
+      <td align="center">7</td>
+      <td align="center">982</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td align="center">9</td>
+      <td align="center">2</td>
+      <td align="center">3</td>
+      <td align="center">3</td>
+      <td align="center">2</td>
+      <td align="center">9</td>
+      <td align="center">7</td>
+      <td align="center">922</td>
+      <td align="center">1</td>
+      <td align="center">2</td>
+      <td align="center">0</td>
+      <td align="center">958</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td align="center">0</td>
+      <td align="center">8</td>
+      <td align="center">28</td>
+      <td align="center">7</td>
+      <td align="center">7</td>
+      <td align="center">1</td>
+      <td align="center">0</td>
+      <td align="center">948</td>
+      <td align="center">2</td>
+      <td align="center">27</td>
+      <td align="center">1028</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td align="center">8</td>
+      <td align="center">5</td>
+      <td align="center">4</td>
+      <td align="center">10</td>
+      <td align="center">10</td>
+      <td align="center">9</td>
+      <td align="center">8</td>
+      <td align="center">8</td>
+      <td align="center">895</td>
+      <td align="center">17</td>
+      <td align="center">974</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td align="center">10</td>
+      <td align="center">6</td>
+      <td align="center">5</td>
+      <td align="center">10</td>
+      <td align="center">43</td>
+      <td align="center">7</td>
+      <td align="center">0</td>
+      <td align="center">12</td>
+      <td align="center">6</td>
+      <td align="center">910</td>
+      <td align="center">1009</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
 Prediction accuracy: 93.69% in 10000s Samples
