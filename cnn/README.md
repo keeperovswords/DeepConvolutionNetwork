@@ -30,12 +30,24 @@ target_link_libraries( cnn ${OpenCV_LIBS} )
 <h2>Predicting</h2>
 The testing result looks as follows:
 
-++++++++++++++>Predicting<++++++++++++++
-| Total Samples | Correctly Classified  | Incorrectly Classified  |
-| ------------- |:-------------:| -----:|
-| 10000         | 9369          | 631   |
-Prediction accuracy: 93.69% in 10000s Samples
 
+<table>
+  <tbody>
+    <tr>
+	<th align="center"><th align="center">Total Samples </th></th>
+	<th align="center">Correctly Classified</th>
+	<th align="center">Incorrectly Classified</th>
+    </tr>
+    <tr>
+      <td>10000</td>
+      <td align="center">0.984</td>
+      <td align="center">9369</td>
+      <td align="center">631</td>
+    </tr>
+  </tbody>
+</table>
+Prediction accuracy: 93.69% in 10000s Samples
+###DETAILS###
 <table>
   <tbody>
     <tr>
@@ -45,8 +57,6 @@ Prediction accuracy: 93.69% in 10000s Samples
       <th align="right">Precision</th>
       <th align="right">Recall</th>
       <th align="right">F-Measure</th>
-      <th align="right">ROC Area</th>
-
     </tr>
     <tr>
       <td>0</td>
@@ -235,7 +245,6 @@ Prediction accuracy: 93.69% in 10000s Samples
     <tr>
       <td>6</td>
       <td align="center">9</td>
-      <td align="center">2</td>
       <td align="center">3</td>
       <td align="center">3</td>
       <td align="center">2</td>
