@@ -1,18 +1,18 @@
 # deepconvolutionnetwork
 
-<h1>training</h1> 
+<h1>Training</h1> 
 This model has only convolution layer + mean sub-pooling layer and a dense fully connected output layer.
 For penalty function we used L2-norm and for minimizing the mini-batch SGD+momentum has been applied.
 
 
-<h2>write CMakeLists.txt</h2>
+<h2>Write CMakeLists.txt</h2>
 
-cmake_minimum_required(VERSION 2.8)
-project( cnn )
-find_package( OpenCV )
-include_directories( ${OpenCV_INCLUDE_DIRS} )
-add_executable( cnn main.cpp Utilities.cpp dcnn.cpp )
-target_link_libraries( cnn ${OpenCV_LIBS} )
+<br>cmake_minimum_required(VERSION 2.8)</br>
+<br>project( cnn )</br>
+<br>find_package( OpenCV )</br>
+<br>include_directories( ${OpenCV_INCLUDE_DIRS} )</br>
+<br>add_executable( cnn main.cpp Utilities.cpp dcnn.cpp )</br>
+<br>target_link_libraries( cnn ${OpenCV_LIBS} )</br>
 
 <h2>Compiling</h2>
 # generating make file
@@ -25,9 +25,7 @@ target_link_libraries( cnn ${OpenCV_LIBS} )
 : ./cnn
 
 
-<h1>test</h1>
-
-<h2>Predicting</h2>
+<h1>Test</h1>
 The testing result looks as follows:
 
 
@@ -47,7 +45,8 @@ The testing result looks as follows:
   </tbody>
 </table>
 Prediction accuracy: 93.69% in 10000s Samples
-###DETAILS###
+
+<h2>Details</h2>
 <table>
   <tbody>
     <tr>
@@ -141,7 +140,7 @@ Prediction accuracy: 93.69% in 10000s Samples
   </tbody>
 </table>
 
-<h2>confusion matrix</h2>
+<h2>Confusion Matrix</h2>
 <table>
   <tbody>
     <tr>
@@ -156,7 +155,7 @@ Prediction accuracy: 93.69% in 10000s Samples
       <th align="right">7</th>
       <th align="right">8</th>
       <th align="right">9</th>
-      <th align="right">labled as</th>
+      <th align="right"><---Labeled as</th>
     </tr>
     <tr>
       <td>0</td>
